@@ -90,7 +90,7 @@ public class IMachinePredicatesLiveTest extends BaseVirtualBoxClientLiveTest {
       IMachine source = getVmWithGuestAdditionsInstalled();
       CloneSpec cloneSpec = CloneSpec.builder().vm(machineSpec.getVmSpec()).network(machineSpec.getNetworkSpec())
                .master(source).linked(true).build();
-      IMachine clone = new CloneAndRegisterMachineFromIMachineIfNotAlreadyExists(manager, workingDir, machineUtils)
+      IMachine clone = new CloneAndRegisterMachineFromIMachineIfNotAlreadyExists(manager, workingDir, machineUtils, networkUtils)
                .apply(cloneSpec);
       assertTrue(isLinkedClone().apply(clone));
    }

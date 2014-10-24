@@ -34,7 +34,6 @@ import org.jclouds.ssh.SshClient;
 import org.jclouds.virtualbox.domain.IsoSpec;
 import org.jclouds.virtualbox.domain.MasterSpec;
 import org.jclouds.virtualbox.domain.VmSpec;
-import org.jclouds.virtualbox.statements.InstallGuestAdditions;
 import org.jclouds.virtualbox.util.MachineController;
 import org.jclouds.virtualbox.util.MachineUtils;
 import org.virtualbox_4_2.DeviceType;
@@ -119,6 +118,7 @@ public class CreateAndInstallVm implements Function<MasterSpec, IMachine> {
       ExecResponse cleanupResponse = Futures.getUnchecked(execCleanup);
       checkState(cleanupResponse.getExitStatus() == 0, "post-installation actions on vm(%s) failed", masterName);
 
+      /*
       logger.debug(">> awaiting installation of guest additions on vm: %s", masterName);
       ListenableFuture<ExecResponse> execInstallGA = machineUtils.runScriptOnNode(nodeMetadata,
                new InstallGuestAdditions(vmSpec, version), RunScriptOptions.NONE);
@@ -132,6 +132,7 @@ public class CreateAndInstallVm implements Function<MasterSpec, IMachine> {
       ExecResponse checkGAinstallationResponse = Futures.getUnchecked(checkGAinstallation);
       checkState(checkGAinstallationResponse.getExitStatus() == 0, "check installation of guest additions on vm(%s) " +
               "failed", masterName);
+      */
 
       machineController.ensureMachineIsShutdown(masterName);
 

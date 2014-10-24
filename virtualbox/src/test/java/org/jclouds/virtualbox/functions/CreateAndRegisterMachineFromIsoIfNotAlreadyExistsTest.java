@@ -33,6 +33,7 @@ import org.jclouds.virtualbox.domain.NetworkSpec;
 import org.jclouds.virtualbox.domain.StorageController;
 import org.jclouds.virtualbox.domain.VmSpec;
 import org.jclouds.virtualbox.util.MachineUtils;
+import org.jclouds.virtualbox.util.NetworkUtils;
 import org.testng.annotations.Test;
 import org.virtualbox_4_2.CleanupMode;
 import org.virtualbox_4_2.IMachine;
@@ -51,7 +52,7 @@ public class CreateAndRegisterMachineFromIsoIfNotAlreadyExistsTest {
 
    @Test(enabled = false)
    public void testCreateAndSetMemoryWhenNotAlreadyExists() throws Exception {
-
+      NetworkUtils networkUtils = createMock(NetworkUtils.class);
       MachineUtils machineUtils = createMock(MachineUtils.class);
       VirtualBoxManager manager = createMock(VirtualBoxManager.class);
       IVirtualBox vBox = createMock(IVirtualBox.class);
@@ -94,7 +95,7 @@ public class CreateAndRegisterMachineFromIsoIfNotAlreadyExistsTest {
       // TODO: this mock test is not finished.
       replay(manager, createdMachine, vBox, session);
 
-      new CreateAndRegisterMachineFromIsoIfNotAlreadyExists(Suppliers.ofInstance(manager), machineUtils,
+      new CreateAndRegisterMachineFromIsoIfNotAlreadyExists(Suppliers.ofInstance(manager), networkUtils, machineUtils,
             "/tmp/workingDir").apply(machineSpec);
 
       verify(manager, createdMachine, vBox, session);
@@ -103,6 +104,7 @@ public class CreateAndRegisterMachineFromIsoIfNotAlreadyExistsTest {
    @Test(expectedExceptions = IllegalStateException.class)
    public void testFailIfMachineIsAlreadyRegistered() throws Exception {
 
+      NetworkUtils networkUtils = createMock(NetworkUtils.class);
       MachineUtils machineUtils = createMock(MachineUtils.class);
 
       VirtualBoxManager manager = createNiceMock(VirtualBoxManager.class);
@@ -122,13 +124,14 @@ public class CreateAndRegisterMachineFromIsoIfNotAlreadyExistsTest {
       MasterSpec machineSpec = MasterSpec.builder()
             .iso(IsoSpec.builder().sourcePath("some.iso").installationScript("dostuff").build())
             .vm(launchSpecification).network(NetworkSpec.builder().build()).build();
-      new CreateAndRegisterMachineFromIsoIfNotAlreadyExists(Suppliers.ofInstance(manager), machineUtils,
+      new CreateAndRegisterMachineFromIsoIfNotAlreadyExists(Suppliers.ofInstance(manager), networkUtils, machineUtils,
             "/tmp/workingDir").apply(machineSpec);
    }
 
    @Test(expectedExceptions = VBoxException.class)
    public void testFailIfOtherVBoxExceptionIsThrown() throws Exception {
 
+      NetworkUtils networkUtils = createMock(NetworkUtils.class);
       MachineUtils machineUtils = createMock(MachineUtils.class);
 
       VirtualBoxManager manager = createNiceMock(VirtualBoxManager.class);
@@ -151,9 +154,8 @@ public class CreateAndRegisterMachineFromIsoIfNotAlreadyExistsTest {
             .iso(IsoSpec.builder().sourcePath("some.iso").installationScript("dostuff").build())
             .vm(launchSpecification).network(NetworkSpec.builder().build()).build();
 
-      new CreateAndRegisterMachineFromIsoIfNotAlreadyExists(Suppliers.ofInstance(manager), machineUtils,
+      new CreateAndRegisterMachineFromIsoIfNotAlreadyExists(Suppliers.ofInstance(manager), networkUtils, machineUtils,
             "/tmp/workingDir").apply(machineSpec);
-
    }
 
    private String anyString() {

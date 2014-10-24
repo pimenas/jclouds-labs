@@ -258,12 +258,17 @@ public class MastersLoadingCache extends AbstractLoadingCache<Image, Master> {
       }
       File file = new File(isosDir, fileName);
       List<Statement> statements = new ImmutableList.Builder<Statement>().add(
-            Statements.saveHttpResponseTo(URI.create(httpUrl), isosDir, fileName)).build();
+            Statements
+            .exec(String.format("curl -q -s -L -S --connect-timeout 10 --retry 20 -C - %s -o %s/%s", httpUrl, isosDir, fileName)))
+         .build();
       StatementList statementList = new StatementList(statements);
       NodeMetadata hostNode = checkNotNull(hardcodedHostToHostNodeMetadata.apply(host.get()), "hostNode");
-      ListenableFuture<ExecResponse> future = runScriptOnNodeFactory.submit(hostNode, statementList,
-            runAsRoot(false));
-      Futures.getUnchecked(future);
+
+      if (!file.exists()) {
+          ListenableFuture<ExecResponse> future = runScriptOnNodeFactory.submit(hostNode, statementList,
+                  runAsRoot(false));
+          Futures.getUnchecked(future);
+      }
 
       if (expectedMd5 != null) {
          String filePath = isosDir + File.separator + fileName;

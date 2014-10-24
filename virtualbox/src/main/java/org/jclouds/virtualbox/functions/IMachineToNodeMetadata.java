@@ -106,6 +106,7 @@ public class IMachineToNodeMetadata implements Function<IMachine, NodeMetadata> 
       if (nodeState == null)
          nodeState = Status.UNRECOGNIZED;
       nodeMetadataBuilder.status(nodeState);
+      nodeMetadataBuilder.backendStatus(String.valueOf(vmState));
       nodeMetadataBuilder = getIpAddresses(vm, nodeMetadataBuilder);
       
       IGuestOSType guestOSType = virtualboxManager.get().getVBox().getGuestOSType(vm.getOSTypeId());
@@ -151,8 +152,13 @@ public class IMachineToNodeMetadata implements Function<IMachine, NodeMetadata> 
                privateIpAddresses.add(clientIpAddress);
 
             } else if (adapter.getAttachmentType() == NetworkAttachmentType.HostOnly) {
-               String clientIpAddress = networkUtils.getValidHostOnlyIpFromVm(vm.getName());             
-               publicIpAddresses.add(clientIpAddress);
+               try {
+                  String clientIpAddress = networkUtils.getValidHostOnlyIpFromVm(vm.getName());             
+                  publicIpAddresses.add(clientIpAddress);
+               } catch (Exception e) {
+                  logger.warn(e.getMessage());
+                  logger.trace(e.getMessage(), e);
+               }
             }
          }
       }

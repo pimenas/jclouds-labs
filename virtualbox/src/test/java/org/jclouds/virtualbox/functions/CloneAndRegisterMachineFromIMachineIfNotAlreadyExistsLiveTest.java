@@ -106,7 +106,7 @@ public class CloneAndRegisterMachineFromIMachineIfNotAlreadyExistsLiveTest exten
       CloneSpec cloneSpec = CloneSpec.builder().vm(machineSpec.getVmSpec()).network(machineSpec.getNetworkSpec())
                .master(source).linked(true).build();
       IMachine clone = checkNotNull(
-              new CloneAndRegisterMachineFromIMachineIfNotAlreadyExists(manager, workingDir, machineUtils)
+              new CloneAndRegisterMachineFromIMachineIfNotAlreadyExists(manager, workingDir, machineUtils, networkUtils)
                                 .apply(cloneSpec), "clone");
       assertEquals(clone.getName(), cloneSpec.getVmSpec().getVmName());
 

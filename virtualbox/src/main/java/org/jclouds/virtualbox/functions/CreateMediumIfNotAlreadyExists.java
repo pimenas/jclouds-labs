@@ -114,7 +114,7 @@ public class CreateMediumIfNotAlreadyExists implements Function<HardDisk, IMediu
 
    private void createBaseStorage(IMedium hardDisk) {
       try {
-         long size = 4L * 1024L * 1024L * 1024L - 4L;
+         long size = 2L * 4L * 1024L * 1024L * 1024L - 4L;
          IProgress storageCreation = hardDisk.createBaseStorage(size,
                   (long) org.virtualbox_4_2.jaxws.MediumVariant.STANDARD.ordinal());
          storageCreation.waitForCompletion(-1);

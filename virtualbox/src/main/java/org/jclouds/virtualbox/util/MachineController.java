@@ -196,7 +196,7 @@ public class MachineController {
          @Override
          public Void apply(ISession session) {
             checkState(
-                  retry(new AdditionsStatusPredicate(session), 10, 2, SECONDS).apply(AdditionsRunLevelType.Userland),
+                  retry(new AdditionsStatusPredicate(session), 60, 2, SECONDS).apply(AdditionsRunLevelType.Userland),
                   "timed out waiting for additionsRunLevelType to be %s", AdditionsRunLevelType.Userland);
             checkState(retry(new FacilitiesPredicate(session), 15, 3, SECONDS).apply(4),
                   "timed out waiting for 4 running facilities");

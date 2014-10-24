@@ -42,6 +42,7 @@ import org.jclouds.virtualbox.domain.NetworkSpec;
 import org.jclouds.virtualbox.domain.StorageController;
 import org.jclouds.virtualbox.domain.VmSpec;
 import org.jclouds.virtualbox.util.MachineUtils;
+import org.jclouds.virtualbox.util.NetworkUtils;
 import org.virtualbox_4_2.AccessMode;
 import org.virtualbox_4_2.DeviceType;
 import org.virtualbox_4_2.IMachine;
@@ -63,13 +64,15 @@ public class CreateAndRegisterMachineFromIsoIfNotAlreadyExists implements Functi
 
    private final Supplier<VirtualBoxManager> manager;
    private final MachineUtils machineUtils;
+   private final NetworkUtils networkUtils;
 
    private final String workingDir;
 
    @Inject
-   public CreateAndRegisterMachineFromIsoIfNotAlreadyExists(Supplier<VirtualBoxManager> manager,
+   public CreateAndRegisterMachineFromIsoIfNotAlreadyExists(Supplier<VirtualBoxManager> manager, NetworkUtils networkUtils,
             MachineUtils machineUtils, @Named(VirtualBoxConstants.VIRTUALBOX_WORKINGDIR) String workingDir) {
       this.manager = manager;
+      this.networkUtils = networkUtils;
       this.machineUtils = machineUtils;
       this.workingDir = workingDir;
    }
@@ -101,6 +104,7 @@ public class CreateAndRegisterMachineFromIsoIfNotAlreadyExists implements Functi
       IMachine newMachine = vBox.createMachine(settingsFile, vmSpec.getVmName(), groups, vmSpec.getOsTypeId(), flags);
       
       manager.get().getVBox().registerMachine(newMachine);
+      networkUtils.fixDnsResolver(masterSpec.getVmSpec().getVmName());
       ensureConfiguration(masterSpec);
       return newMachine;
    }

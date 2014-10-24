@@ -48,6 +48,7 @@ import org.jclouds.virtualbox.util.MachineController;
 import org.virtualbox_4_2.IMachine;
 import org.virtualbox_4_2.IProgress;
 import org.virtualbox_4_2.ISession;
+import org.virtualbox_4_2.LockType;
 import org.virtualbox_4_2.MachineState;
 import org.virtualbox_4_2.VBoxException;
 import org.virtualbox_4_2.VirtualBoxManager;
@@ -226,32 +227,44 @@ public class VirtualBoxComputeServiceAdapter implements ComputeServiceAdapter<IM
    @Override
    public void resumeNode(String vmName) {
       IMachine machine = manager.get().getVBox().findMachine(vmName);
-      ISession machineSession;
+      ISession session = null;
       try {
-         machineSession = manager.get().openMachineSession(machine);
-         machineSession.getConsole().resume();
-         machineSession.unlockMachine();
+         session = manager.get().getSessionObject();
+         progress(machine.launchVMProcess(session, "headless", ""));
       } catch (Exception e) {
          throw Throwables.propagate(e);
+      } finally {
+         /* do not leave locked sessions. */
+         if (session != null) {
+            try {
+               session.unlockMachine();
+            } catch (Exception e) { }
+         }
       }
    }
 
    @Override
    public void suspendNode(String vmName) {
       IMachine machine = manager.get().getVBox().findMachine(vmName);
-      ISession machineSession;
+      ISession session = null;
       try {
-         machineSession = manager.get().openMachineSession(machine);
-         machineSession.getConsole().pause();
-         machineSession.unlockMachine();
+         session = manager.get().getSessionObject();
+         machine.lockMachine(session, LockType.Shared);
+         progress(session.getConsole().saveState());
       } catch (Exception e) {
          throw Throwables.propagate(e);
+      } finally {
+         /* do not leave locked sessions. */
+         if (session != null) {
+            try {
+               session.unlockMachine();
+            } catch (Exception e) { }
+         }
       }
    }
 
    private void launchVMProcess(IMachine machine, ISession session) {
-      IProgress prog = machine.launchVMProcess(session, "gui", "");
-      prog.waitForCompletion(-1);
+      progress(machine.launchVMProcess(session, "headless", ""));
       session.unlockMachine();
    }
 
@@ -268,4 +281,12 @@ public class VirtualBoxComputeServiceAdapter implements ComputeServiceAdapter<IM
          throw Throwables.propagate(e);
       }
    }
+
+   private void progress(IProgress progress) {
+       while (!progress.getCompleted()) {
+           progress.waitForCompletion(1000);
+           logger.debug(">> task %s, percent complete: %s%%", progress.getDescription(), progress.getPercent());
+       }
+   }
+
 }

@@ -173,6 +173,7 @@ public class VirtualBoxComputeServiceContextModule extends
    public static final Map<MachineState, NodeMetadata.Status> toPortableNodeStatus = ImmutableMap
             .<MachineState, NodeMetadata.Status> builder().put(MachineState.Running, NodeMetadata.Status.RUNNING)
             .put(MachineState.PoweredOff, NodeMetadata.Status.SUSPENDED)
+            .put(MachineState.Saved, NodeMetadata.Status.SUSPENDED)
             .put(MachineState.DeletingSnapshot, NodeMetadata.Status.PENDING)
             .put(MachineState.DeletingSnapshotOnline, NodeMetadata.Status.PENDING)
             .put(MachineState.DeletingSnapshotPaused, NodeMetadata.Status.PENDING)

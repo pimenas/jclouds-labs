@@ -61,7 +61,7 @@ public class EnableNetworkInterface implements Statement {
       List<Statement> statements = Lists.newArrayList();
       statements.add(exec(String.format("echo auto %s >> /etc/network/interfaces", iface)));
       statements.add(exec(String.format("echo iface %s inet dhcp >> /etc/network/interfaces", iface)));
-      statements.add(exec("/etc/init.d/networking restart"));
+      statements.add(exec("/sbin/ifup -a"));
       return statements;
    }
 

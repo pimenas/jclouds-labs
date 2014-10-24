@@ -119,7 +119,7 @@ public class GuestAdditionsInstallerLiveTest extends BaseVirtualBoxClientLiveTes
             .master(source)
             .linked(true)
             .build();
-      return new CloneAndRegisterMachineFromIMachineIfNotAlreadyExists(manager, workingDir, machineUtils)
+      return new CloneAndRegisterMachineFromIMachineIfNotAlreadyExists(manager, workingDir, machineUtils, networkUtils)
                .apply(cloneSpec);
    }
 

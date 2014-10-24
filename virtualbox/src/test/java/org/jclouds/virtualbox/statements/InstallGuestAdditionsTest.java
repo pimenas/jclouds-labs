@@ -48,7 +48,7 @@ public class InstallGuestAdditionsTest {
       assertEquals(installGuestAdditions.render(OsFamily.UNIX), 
             "installModuleAssistantIfNeeded || return 1\n" +
              "mount -t iso9660 /dev/cdrom1 /mnt\n" +
-             "/mnt/VBoxLinuxAdditions.run --nox11\n");
+             "/mnt/VBoxLinuxAdditions.run --nox11 || echo ugly fix for VBoxLinuxAdditions returning 1\n");
    }
    
    @Test
@@ -71,6 +71,6 @@ public class InstallGuestAdditionsTest {
             "setupPublicCurl || return 1\n" +
             "(mkdir -p /tmp/ && cd /tmp/ && [ ! -f VBoxGuestAdditions_4.2.0.iso ] && curl -q -s -S -L --connect-timeout 10 --max-time 600 --retry 20 -C - -X GET  http://download.virtualbox.org/virtualbox/4.2.0/VBoxGuestAdditions_4.2.0.iso >VBoxGuestAdditions_4.2.0.iso)\n" +
             "mount -o loop /tmp/VBoxGuestAdditions_4.2.0.iso /mnt\n" +
-            "/mnt/VBoxLinuxAdditions.run --nox11\n");
+            "/mnt/VBoxLinuxAdditions.run --nox11 || echo ugly fix for VBoxLinuxAdditions returning 1\n");
    }
 }

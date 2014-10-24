@@ -170,6 +170,13 @@ public class NetworkUtils {
       String dhcpUpperIp = hostOnlyIfIpAddress.substring(0, hostOnlyIfIpAddress.lastIndexOf(".")) + ".253";
       NodeMetadata hostNodeMetadata = getHostNodeMetadata();
 
+      scriptRunnerFactory
+          .create(
+                  hostNodeMetadata,
+                  Statements.exec(String
+                      .format("VBoxManage dhcpserver remove --ifname %s", hostOnlyIfName)),
+                  runAsRoot(false).wrapInInitScript(false)).init().call();
+
       ExecResponse response = scriptRunnerFactory
             .create(
                   hostNodeMetadata,
@@ -179,6 +186,18 @@ public class NetworkUtils {
                               hostOnlyIfName, dhcpIpAddress, dhcpNetmask, dhcpLowerIp, dhcpUpperIp)),
                   runAsRoot(false).wrapInInitScript(false)).init().call();
       checkState(response.getExitStatus() == 0);
+   }
+
+   public void fixDnsResolver(String vmName) {
+       NodeMetadata hostNodeMetadata = getHostNodeMetadata();
+
+       ExecResponse response = scriptRunnerFactory
+           .create(
+                   hostNodeMetadata,
+                   Statements.exec(String
+                       .format("VBoxManage modifyvm %s --natdnshostresolver1 on --natdnshostresolver2 on", vmName)),
+                   runAsRoot(false).wrapInInitScript(false)).init().call();
+       checkState(response.getExitStatus() == 0);
    }
 
    private String createHostOnlyIf() {

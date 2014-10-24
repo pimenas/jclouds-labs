@@ -32,6 +32,7 @@ import org.jclouds.virtualbox.domain.NetworkInterfaceCard;
 import org.jclouds.virtualbox.domain.NetworkSpec;
 import org.jclouds.virtualbox.domain.VmSpec;
 import org.jclouds.virtualbox.util.MachineUtils;
+import org.jclouds.virtualbox.util.NetworkUtils;
 import org.virtualbox_4_2.CloneMode;
 import org.virtualbox_4_2.CloneOptions;
 import org.virtualbox_4_2.IMachine;
@@ -59,13 +60,16 @@ public class CloneAndRegisterMachineFromIMachineIfNotAlreadyExists implements Fu
    private final Supplier<VirtualBoxManager> manager;
    private final String workingDir;
    private final MachineUtils machineUtils;
+   private final NetworkUtils networkUtils;
    
    @Inject
    public CloneAndRegisterMachineFromIMachineIfNotAlreadyExists(Supplier<VirtualBoxManager> manager,
-            @Named(VirtualBoxConstants.VIRTUALBOX_WORKINGDIR) String workingDir, MachineUtils machineUtils) {
+            @Named(VirtualBoxConstants.VIRTUALBOX_WORKINGDIR) String workingDir,
+            MachineUtils machineUtils, NetworkUtils networkUtils) {
       this.manager = manager;
       this.workingDir = workingDir;
       this.machineUtils = machineUtils;
+      this.networkUtils = networkUtils;
    }
 
    @Override
@@ -120,6 +124,9 @@ public class CloneAndRegisterMachineFromIMachineIfNotAlreadyExists implements Fu
       for (NetworkInterfaceCard networkInterfaceCard : networkSpec.getNetworkInterfaceCards()) {
          new AttachNicToMachine(vmSpec.getVmName(), machineUtils).apply(networkInterfaceCard);
       }
+
+      // Fix Dns issue
+      networkUtils.fixDnsResolver(vmSpec.getVmName());
       
       // set only once the creds for this machine, same coming from its master
       logger.debug("<< storing guest credentials on vm(%s) as extra data", clonedMachine.getName());

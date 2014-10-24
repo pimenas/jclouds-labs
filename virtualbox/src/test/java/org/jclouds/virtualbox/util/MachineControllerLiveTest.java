@@ -99,7 +99,7 @@ public class MachineControllerLiveTest extends BaseVirtualBoxClientLiveTest {
       IMachine source = getVmWithGuestAdditionsInstalled();
       CloneSpec cloneSpec = CloneSpec.builder().vm(masterSpec.getVmSpec()).network(masterSpec.getNetworkSpec())
             .master(source).linked(true).build();
-      return new CloneAndRegisterMachineFromIMachineIfNotAlreadyExists(manager, workingDir, machineUtils)
+      return new CloneAndRegisterMachineFromIMachineIfNotAlreadyExists(manager, workingDir, machineUtils, networkUtils)
             .apply(cloneSpec);
    }
 
